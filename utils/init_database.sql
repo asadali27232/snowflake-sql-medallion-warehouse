@@ -1,7 +1,12 @@
 /*
-  INIT DATABASE: Setup Medallion Architecture (Bronze -> Silver -> Gold)
-  WARNING: 'CREATE OR REPLACE' will drop all existing data.
-  REQUIREMENTS: ROLE: ACCOUNTADMIN, WH: COMPUTE_WH
+INIT DATABASE:
+  Setup Medallion Architecture (Bronze -> Silver -> Gold)
+
+WARNING:
+  'CREATE OR REPLACE' will drop all existing data.
+  
+REQUIREMENTS:
+  ROLE: ACCOUNTADMIN, WH: COMPUTE_WH
 */
 USE ROLE ACCOUNTADMIN;
 USE WAREHOUSE COMPUTE_WH;

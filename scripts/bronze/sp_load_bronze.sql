@@ -19,21 +19,7 @@ BEGIN
     v_log_msg := v_log_msg || 'BRONZE LOAD STARTED: ' || v_start_time::STRING || '\n';
     v_log_msg := v_log_msg || '==========================================================\n';
 
-    -- 1. Sync Stage Metadata with S3 (to detect new/replaced files)
-    -- Moving this here makes orchestration simpler and more reliable.
-    ALTER STAGE DATA_WAREHOUSE.BRONZE.BRONZE_STAGE REFRESH;
-
-    -- 2. Setup Stage (Ensures definition is correct)
-    CREATE OR REPLACE STAGE DATA_WAREHOUSE.BRONZE.BRONZE_STAGE
-        URL = 's3://snowflake-sql-medallion-warehouse/bronze/'
-        STORAGE_INTEGRATION = s3_bronze_int
-        FILE_FORMAT = (
-            TYPE = CSV 
-            FIELD_OPTIONALLY_ENCLOSED_BY = '"' 
-            SKIP_HEADER = 1
-        );
-
-    -- 3. Load CRM Data (source_crm)
+    -- 1. Load CRM Data (source_crm)
     
     -- Load CRM Customers
     v_step_start_time := CURRENT_TIMESTAMP();
@@ -65,7 +51,7 @@ BEGIN
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'crm_sales_details | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 
-    -- 4. Load ERP Data (source_erp)
+    -- 2. Load ERP Data (source_erp)
 
     -- Load ERP Customers
     v_step_start_time := CURRENT_TIMESTAMP();

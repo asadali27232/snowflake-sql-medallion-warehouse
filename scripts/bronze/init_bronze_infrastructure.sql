@@ -17,3 +17,14 @@ CREATE OR REPLACE STORAGE INTEGRATION s3_bronze_int
 
 -- Run this to get the External ID for AWS Trust Relationship
 DESC STORAGE INTEGRATION s3_bronze_int;
+
+-- Setup Stage (Ensures definition is correct)
+CREATE OR REPLACE STAGE DATA_WAREHOUSE.BRONZE.BRONZE_STAGE
+    URL = 's3://snowflake-sql-medallion-warehouse/bronze/'
+    STORAGE_INTEGRATION = s3_bronze_int
+    DIRECTORY = (ENABLE = TRUE)
+    FILE_FORMAT = (
+        TYPE = CSV 
+        FIELD_OPTIONALLY_ENCLOSED_BY = '"' 
+        SKIP_HEADER = 1
+    );

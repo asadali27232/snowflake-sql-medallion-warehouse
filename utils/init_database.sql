@@ -4,7 +4,7 @@ INIT DATABASE:
 
 WARNING:
   'CREATE OR REPLACE' will drop all existing data.
-  
+
 REQUIREMENTS:
   ROLE: ACCOUNTADMIN, WH: COMPUTE_WH
 */

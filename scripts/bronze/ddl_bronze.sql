@@ -22,45 +22,51 @@ CREATE OR REPLACE TABLE bronze.crm_cust_info (
     cst_lastname        STRING,
     cst_marital_status  STRING,
     cst_gndr            STRING,
-    cst_create_date     DATE
+    cst_create_date     DATE,
+    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 CREATE OR REPLACE TABLE bronze.crm_prd_info (
-    prd_id       INT,
-    prd_key      STRING,
-    prd_nm       STRING,
-    prd_cost     INT,
-    prd_line     STRING,
-    prd_start_dt DATETIME,
-    prd_end_dt   DATETIME
+    prd_id              INT,
+    prd_key             STRING,
+    prd_nm              STRING,
+    prd_cost            INT,
+    prd_line            STRING,
+    prd_start_dt        DATETIME,
+    prd_end_dt          DATETIME,
+    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 CREATE OR REPLACE TABLE bronze.crm_sales_details (
-    sls_ord_num  STRING,
-    sls_prd_key  STRING,
-    sls_cust_id  INT,
-    sls_order_dt INT,
-    sls_ship_dt  INT,
-    sls_due_dt   INT,
-    sls_sales    INT,
-    sls_quantity INT,
-    sls_price    INT
+    sls_ord_num         STRING,
+    sls_prd_key         STRING,
+    sls_cust_id         INT,
+    sls_order_dt        INT,
+    sls_ship_dt         INT,
+    sls_due_dt          INT,
+    sls_sales           INT,
+    sls_quantity        INT,
+    sls_price           INT,
+    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 CREATE OR REPLACE TABLE bronze.erp_loc_a101 (
-    cid    STRING,
-    cntry  STRING
+    cid                 STRING,
+    cntry               STRING,
+    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 CREATE OR REPLACE TABLE bronze.erp_cust_az12 (
-    cid    STRING,
-    bdate  DATE,
-    gen    STRING
+    cid                 STRING,
+    bdate               DATE,
+    gen                 STRING,
+    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 CREATE OR REPLACE TABLE bronze.erp_px_cat_g1v2 (
-    id           STRING,
-    cat          STRING,
-    subcat       STRING,
-    maintenance  STRING
+    id                  STRING,
+    cat                 STRING,
+    subcat              STRING,
+    maintenance         STRING,
+    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );

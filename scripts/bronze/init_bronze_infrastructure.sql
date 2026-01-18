@@ -1,9 +1,14 @@
 /*
-==============================================================================
-BRONZE INFRASTRUCTURE SETUP
-Description: Creates the Storage Integration for S3. 
-Note: This should be run ONCE manually to maintain a stable AWS External ID.
-==============================================================================
+BRONZE LAYER INFRASTRUCTURE:
+  Setup Storage Integration and External Stage for S3.
+  This script establishes the connection between Snowflake and AWS.
+
+WARNING:
+  Manually run ONCE to maintain a stable AWS External ID.
+  Re-creating Storage Integration changes the required Trust Relationship.
+
+REQUIREMENTS:
+  ROLE: ACCOUNTADMIN, WH: COMPUTE_WH, DB: DATA_WAREHOUSE, SCHEMA: BRONZE
 */
 
 USE ROLE ACCOUNTADMIN;

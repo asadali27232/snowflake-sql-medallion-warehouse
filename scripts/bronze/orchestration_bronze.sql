@@ -1,3 +1,15 @@
+/*
+BRONZE LAYER ORCHESTRATION:
+  Automate the Bronze load using S3 Directory Streams and Tasks.
+  Ensures data is loaded only when changes are detected in S3.
+
+WARNING:
+  Tasks must be RESUMED manually after modification or deployment.
+
+REQUIREMENTS:
+  ROLE: ACCOUNTADMIN, WH: COMPUTE_WH, DB: DATA_WAREHOUSE, SCHEMA: BRONZE
+*/
+
 USE ROLE ACCOUNTADMIN;
 USE DATABASE DATA_WAREHOUSE;
 USE SCHEMA BRONZE;

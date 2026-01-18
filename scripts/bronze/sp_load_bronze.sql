@@ -1,3 +1,15 @@
+/*
+BRONZE LAYER STORED PROCEDURE:
+  Load raw data from S3 to Bronze tables.
+  Handles truncation of existing data for a fresh load.
+
+WARNING:
+  This procedure will TRUNCATE existing tables before loading.
+
+REQUIREMENTS:
+  ROLE: ACCOUNTADMIN, WH: COMPUTE_WH, DB: DATA_WAREHOUSE, SCHEMA: BRONZE
+*/
+
 USE ROLE ACCOUNTADMIN;
 USE DATABASE DATA_WAREHOUSE;
 USE SCHEMA BRONZE;

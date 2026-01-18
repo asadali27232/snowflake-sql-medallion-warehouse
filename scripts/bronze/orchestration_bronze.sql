@@ -3,10 +3,11 @@ USE DATABASE DATA_WAREHOUSE;
 USE SCHEMA BRONZE;
 
 -- 1. Ensure Directory Table is enabled for the Stage
--- This is a prerequisite for creating a Stream on a Stage.
+-- Using ALTER instead of CREATE OR REPLACE to avoid breaking existing streams.
 ALTER STAGE DATA_WAREHOUSE.BRONZE.BRONZE_STAGE SET DIRECTORY = (ENABLE = TRUE);
 
--- 2. Create a Stream to track S3 file changes
+-- 2. Create or Recreate the Stream
+-- If you ever see "Base stage dropped", running this script will fix it.
 CREATE OR REPLACE STREAM DATA_WAREHOUSE.BRONZE.BRONZE_STAGE_STREAM
     ON STAGE DATA_WAREHOUSE.BRONZE.BRONZE_STAGE;
 
@@ -25,6 +26,6 @@ CREATE OR REPLACE TASK DATA_WAREHOUSE.BRONZE.TSK_LOAD_BRONZE
 AS
     CALL DATA_WAREHOUSE.BRONZE.SP_LOAD_BRONZE();
 
--- 5. Resume both (Child first, then Parent)
+-- 5. Resume tasks (Child first)
 ALTER TASK DATA_WAREHOUSE.BRONZE.TSK_LOAD_BRONZE RESUME;
 ALTER TASK DATA_WAREHOUSE.BRONZE.TSK_SYNC_S3_META RESUME;

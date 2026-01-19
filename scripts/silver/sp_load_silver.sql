@@ -210,7 +210,9 @@ BEGIN
             ID,
             CAT,
             SUBCAT,
-            MAINTENANCE
+            MAINTENANCE,
+            EXTRACTION_TIME,
+            CURRENT_TIMESTAMP() as dwh_create_date
         FROM DATA_WAREHOUSE.BRONZE.ERP_PX_CAT_G1V2
     );
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());

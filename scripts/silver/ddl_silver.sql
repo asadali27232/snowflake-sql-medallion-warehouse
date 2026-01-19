@@ -23,7 +23,7 @@ CREATE OR REPLACE TABLE silver.crm_cust_info (
     cst_marital_status  STRING,
     cst_gndr            STRING,
     cst_create_date     DATE,
-    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    extraction_time     TIMESTAMP_NTZ,
     dwh_create_date     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
@@ -35,7 +35,7 @@ CREATE OR REPLACE TABLE silver.crm_prd_info (
     prd_line            STRING,
     prd_start_dt        DATETIME,
     prd_end_dt          DATETIME,
-    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    extraction_time     TIMESTAMP_NTZ,
     dwh_create_date     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
@@ -49,14 +49,14 @@ CREATE OR REPLACE TABLE silver.crm_sales_details (
     sls_sales           INT,
     sls_quantity        INT,
     sls_price           INT,
-    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    extraction_time     TIMESTAMP_NTZ,
     dwh_create_date     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 CREATE OR REPLACE TABLE silver.erp_loc_a101 (
     cid                 STRING,
     cntry               STRING,
-    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    extraction_time     TIMESTAMP_NTZ,
     dwh_create_date     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
@@ -64,7 +64,7 @@ CREATE OR REPLACE TABLE silver.erp_cust_az12 (
     cid                 STRING,
     bdate               DATE,
     gen                 STRING,
-    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    extraction_time     TIMESTAMP_NTZ,
     dwh_create_date     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
@@ -73,6 +73,6 @@ CREATE OR REPLACE TABLE silver.erp_px_cat_g1v2 (
     cat                 STRING,
     subcat              STRING,
     maintenance         STRING,
-    extraction_time     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    extraction_time     TIMESTAMP_NTZ,
     dwh_create_date     TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );

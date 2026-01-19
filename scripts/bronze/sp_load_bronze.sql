@@ -35,7 +35,42 @@ BEGIN
     -- Load CRM Customers
     v_step_start_time := CURRENT_TIMESTAMP();
     TRUNCATE TABLE DATA_WAREHOUSE.BRONZE.CRM_CUST_INFO;
-    
+    INSERT INTO DATA_WAREHOUSE.SILVER.CRM_CUST_INFO
+    (
+        SELECT
+            CST_ID,
+            CST_KEY,
+            CST_FIRSTNAME,
+            CST_LASTNAME,
+            CST_MARITAL_STATUS,
+            CST_GNDR,
+            CST_CREATE_DATE,
+            EXTRACTION_TIME,
+            CURRENT_TIMESTAMP() AS dwh_create_date
+        FROM (
+            SELECT
+                CST_ID,
+                CST_KEY,
+                TRIM(CST_FIRSTNAME) AS CST_FIRSTNAME,
+                TRIM(CST_LASTNAME) AS CST_LASTNAME,
+                CASE
+                    WHEN UPPER(CST_MARITAL_STATUS) = 'S' THEN 'SINGLE'
+                    WHEN UPPER(CST_MARITAL_STATUS) = 'M' THEN 'MARRIED'
+                    ELSE 'UNKNOWN'
+                END AS CST_MARITAL_STATUS,
+                CASE
+                    WHEN UPPER(CST_GNDR) = 'M' THEN 'MALE'
+                    WHEN UPPER(CST_GNDR) = 'F' THEN 'FEMALE'
+                    ELSE 'UNKNOWN'
+                END AS CST_GNDR,
+                CST_CREATE_DATE,
+                EXTRACTION_TIME,
+                ROW_NUMBER() OVER (PARTITION BY CST_ID ORDER BY CST_CREATE_DATE DESC) AS ROW_RANK
+            FROM
+                DATA_WAREHOUSE.BRONZE.CRM_CUST_INFO
+        ) AS t
+        WHERE ROW_RANK = 1
+    );
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'crm_cust_info     | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 

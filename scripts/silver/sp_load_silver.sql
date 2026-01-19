@@ -13,7 +13,7 @@ USE ROLE ACCOUNTADMIN;
 USE DATABASE DATA_WAREHOUSE;
 USE SCHEMA SILVER;
 
-CREATE OR REPLACE PROCEDURE DATA_WAREHOUSE.BRONZE.SP_LOAD_BRONZE()
+CREATE OR REPLACE PROCEDURE DATA_WAREHOUSE.SILVER.SP_LOAD_SILVER()
 RETURNS STRING
 LANGUAGE SQL
 AS
@@ -27,14 +27,14 @@ DECLARE
 BEGIN
     v_start_time := CURRENT_TIMESTAMP();
     v_log_msg := v_log_msg || '==========================================================\n';
-    v_log_msg := v_log_msg || 'BRONZE LOAD STARTED: ' || v_start_time::STRING || '\n';
+    v_log_msg := v_log_msg || 'SILVER LOAD STARTED: ' || v_start_time::STRING || '\n';
     v_log_msg := v_log_msg || '==========================================================\n';
 
     -- 1. Load CRM Data (source_crm)
     
     -- Load CRM Customers
     v_step_start_time := CURRENT_TIMESTAMP();
-    TRUNCATE TABLE DATA_WAREHOUSE.BRONZE.CRM_CUST_INFO;
+    TRUNCATE TABLE DATA_WAREHOUSE.SILVER.CRM_CUST_INFO;
     INSERT INTO DATA_WAREHOUSE.SILVER.CRM_CUST_INFO
     (
         SELECT
@@ -76,18 +76,46 @@ BEGIN
 
     -- Load CRM Products
     v_step_start_time := CURRENT_TIMESTAMP();
-    TRUNCATE TABLE DATA_WAREHOUSE.BRONZE.CRM_PRD_INFO;
-    
+    TRUNCATE TABLE DATA_WAREHOUSE.SILVER.CRM_PRD_INFO;
+    INSERT INTO DATA_WAREHOUSE.SILVER.CRM_PRD_INFO
+    (
+        SELECT
+            PRD_ID,
+            SUBSTRING(PRD_KEY, 7, LENGTH(PRD_KEY)) AS PRD_KEY,
+            REPLACE(SUBSTRING(PRD_KEY, 1, 5), '-', '_') AS  CAT_ID,
+            TRIM(PRD_NM) AS PRD_NM,
+            COALESCE(PRD_COST, 0) AS PRD_COST,
+            CASE UPPER(TRIM(PRD_LINE))
+                WHEN 'M' THEN 'Mountain'
+                WHEN 'R' THEN 'Road'
+                WHEN 'S' THEN 'Other Sales'
+                WHEN 'T' THEN 'Touring'
+                ELSE 'UNKNOWN'
+            END AS PRD_LINE,
+            CAST(PRD_START_DT AS DATE) AS PRD_START_DT,
+            CAST(
+                DATEADD(
+                day,
+                -1,
+                LEAD(PRD_START_DT) OVER (
+                    PARTITION BY PRD_KEY
+                    ORDER BY PRD_START_DT
+                )
+                ) AS DATE
+            ) AS PRD_END_DT,
+            EXTRACTION_TIME,
+            CURRENT_TIMESTAMP() AS dwh_create_date
+        FROM
+            DATA_WAREHOUSE.BRONZE.CRM_PRD_INFO
+    );
+
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'crm_prd_info      | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 
     -- Load CRM Sales Details
     v_step_start_time := CURRENT_TIMESTAMP();
-    TRUNCATE TABLE DATA_WAREHOUSE.BRONZE.CRM_SALES_DETAILS;
-    COPY INTO DATA_WAREHOUSE.BRONZE.CRM_SALES_DETAILS FROM (
-        SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP() 
-        FROM @DATA_WAREHOUSE.BRONZE.BRONZE_STAGE/source_crm/sales_details.csv
-    );
+    TRUNCATE TABLE DATA_WAREHOUSE.SILVER.CRM_SALES_DETAILS;
+    
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'crm_sales_details | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 
@@ -95,31 +123,22 @@ BEGIN
 
     -- Load ERP Customers
     v_step_start_time := CURRENT_TIMESTAMP();
-    TRUNCATE TABLE DATA_WAREHOUSE.BRONZE.ERP_CUST_AZ12;
-    COPY INTO DATA_WAREHOUSE.BRONZE.ERP_CUST_AZ12 FROM (
-        SELECT $1, $2, $3, CURRENT_TIMESTAMP() 
-        FROM @DATA_WAREHOUSE.BRONZE.BRONZE_STAGE/source_erp/CUST_AZ12.csv
-    );
+    TRUNCATE TABLE DATA_WAREHOUSE.SILVER.ERP_CUST_AZ12;
+    
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'erp_cust_az12     | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 
     -- Load ERP Locations
     v_step_start_time := CURRENT_TIMESTAMP();
-    TRUNCATE TABLE DATA_WAREHOUSE.BRONZE.ERP_LOC_A101;
-    COPY INTO DATA_WAREHOUSE.BRONZE.ERP_LOC_A101 FROM (
-        SELECT $1, $2, CURRENT_TIMESTAMP() 
-        FROM @DATA_WAREHOUSE.BRONZE.BRONZE_STAGE/source_erp/LOC_A101.csv
-    );
+    TRUNCATE TABLE DATA_WAREHOUSE.SILVER.ERP_LOC_A101;
+    
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'erp_loc_a101      | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 
     -- Load ERP Product Categories
     v_step_start_time := CURRENT_TIMESTAMP();
-    TRUNCATE TABLE DATA_WAREHOUSE.BRONZE.ERP_PX_CAT_G1V2;
-    COPY INTO DATA_WAREHOUSE.BRONZE.ERP_PX_CAT_G1V2 FROM (
-        SELECT $1, $2, $3, $4, CURRENT_TIMESTAMP() 
-        FROM @DATA_WAREHOUSE.BRONZE.BRONZE_STAGE/source_erp/PX_CAT_G1V2.csv
-    );
+    TRUNCATE TABLE DATA_WAREHOUSE.SILVER.ERP_PX_CAT_G1V2;
+    
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'erp_px_cat_g1v2   | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 

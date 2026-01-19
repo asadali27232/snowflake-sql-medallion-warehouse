@@ -115,7 +115,40 @@ BEGIN
     -- Load CRM Sales Details
     v_step_start_time := CURRENT_TIMESTAMP();
     TRUNCATE TABLE DATA_WAREHOUSE.SILVER.CRM_SALES_DETAILS;
-    
+    INSERT INTO DATA_WAREHOUSE.SILVER.CRM_SALES_DETAILS
+    (
+        SELECT
+            SLS_ORD_NUM,
+            SLS_PRD_KEY,
+            SLS_CUST_ID,
+            CASE
+                WHEN SLS_ORDER_DT <= 0 OR LENGTH(SLS_ORDER_DT) != 8 THEN NULL
+                ELSE CAST(CAST(SLS_ORDER_DT AS VARCHAR) AS DATE)
+            END AS SLS_ORDER_DT,
+            CASE
+                WHEN SLS_SHIP_DT <= 0 OR LENGTH(SLS_SHIP_DT) != 8 THEN NULL
+                ELSE CAST(CAST(SLS_SHIP_DT AS VARCHAR) AS DATE)
+            END AS SLS_SHIP_DT,
+            CASE
+                WHEN SLS_DUE_DT <= 0 OR LENGTH(SLS_DUE_DT) != 8 THEN NULL
+                ELSE CAST(CAST(SLS_DUE_DT AS VARCHAR) AS DATE)
+            END AS SLS_DUE_DT,
+            CASE
+                WHEN SLS_SALES != SLS_QUANTITY * ABS(SLS_PRICE) OR SLS_SALES IS NULL OR SLS_SALES <=0
+                    THEN ABS(SLS_QUANTITY) * ABS(SLS_PRICE)
+                ELSE ABS(SLS_SALES)
+            END AS SLS_SALES,
+            SLS_QUANTITY,
+            CAST(
+                CASE
+                    WHEN SLS_PRICE IS NULL OR SLS_PRICE <=0 THEN  SLS_SALES / NULLIF(SLS_QUANTITY, 0)
+                    ELSE ABS(SLS_PRICE)
+                END AS INT) AS SLS_PRICE,   
+            EXTRACTION_TIME,
+            CURRENT_TIMESTAMP() AS dwh_create_date
+        FROM
+            DATA_WAREHOUSE.BRONZE.CRM_SALES_DETAILS
+    );
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'crm_sales_details | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 
@@ -124,21 +157,62 @@ BEGIN
     -- Load ERP Customers
     v_step_start_time := CURRENT_TIMESTAMP();
     TRUNCATE TABLE DATA_WAREHOUSE.SILVER.ERP_CUST_AZ12;
-    
+    INSERT INTO DATA_WAREHOUSE.SILVER.ERP_CUST_AZ12
+    (
+        SELECT
+            CASE
+                WHEN CID LIKE 'NAS%' THEN SUBSTRING(CID, 4, LENGTH(CID))
+            END AS CID,
+            CASE
+                WHEN BDATE < '1924-01-01' OR BDATE > CURRENT_DATE() THEN NULL
+                ELSE BDATE
+            END AS BDATE,
+            CASE
+                WHEN UPPER(TRIM(GEN)) IN ('F', 'FEMALE') THEN 'Female'
+                WHEN UPPER(TRIM(GEN)) IN ('M', 'MALE') THEN 'Male'
+                ELSE 'UNKNOWN'
+            END AS GEN,
+            EXTRACTION_TIME,
+            CURRENT_TIMESTAMP() as dwh_create_date
+        FROM
+            DATA_WAREHOUSE.BRONZE.ERP_CUST_AZ12
+    );
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'erp_cust_az12     | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 
     -- Load ERP Locations
     v_step_start_time := CURRENT_TIMESTAMP();
     TRUNCATE TABLE DATA_WAREHOUSE.SILVER.ERP_LOC_A101;
-    
+    INSERT INTO DATA_WAREHOUSE.SILVER.ERP_LOC_A101 
+    (
+        SELECT
+            REPLACE(CID, '-', '') AS CID,
+            CASE
+                WHEN TRIM(CNTRY) IN ('US', 'USA') THEN 'United States'
+                WHEN TRIM(CNTRY) = 'DE' THEN 'Germany'
+                WHEN TRIM(CNTRY) = '' OR CNTRY IS NULL THEN 'UNKNOWN'
+                ELSE TRIM(CNTRY)
+            END AS CNTRY,
+            EXTRACTION_TIME,
+            CURRENT_TIMESTAMP as dwh_create_date
+        FROM
+            DATA_WAREHOUSE.BRONZE.ERP_LOC_A101
+    );
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'erp_loc_a101      | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 
     -- Load ERP Product Categories
     v_step_start_time := CURRENT_TIMESTAMP();
     TRUNCATE TABLE DATA_WAREHOUSE.SILVER.ERP_PX_CAT_G1V2;
-    
+    INSERT INTO DATA_WAREHOUSE.SILVER.ERP_PX_CAT_G1V2
+    (
+        SELECT
+            ID,
+            CAT,
+            SUBCAT,
+            MAINTENANCE
+        FROM DATA_WAREHOUSE.BRONZE.ERP_PX_CAT_G1V2
+    );
     v_duration_sec := DATEDIFF(SECOND, v_step_start_time, CURRENT_TIMESTAMP());
     v_log_msg := v_log_msg || 'erp_px_cat_g1v2   | Ingested in: ' || v_duration_sec::STRING || ' sec\n';
 
@@ -154,4 +228,3 @@ EXCEPTION
         RETURN 'ERROR ENCOUNTERED: ' || SQLERRM;
 END;
 $$;
-

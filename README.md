@@ -8,9 +8,7 @@
 
 ## 📖 Overview
 
-This project implements a robust **Medallion Architecture** within **Snowflake**, transforming raw data into high-value business insights. By utilizing a three-tier logical structure—**Bronze**, **Silver**, and **Gold**—we ensure data integrity, traceability, and optimized performance for high-level analytics and business intelligence.
-
-The architecture leverages **Snowflake's** cloud-native SQL engine and **AWS S3** for seamless data ingestion and transformation.
+This project implements a complete **End-to-End Medallion Data Pipeline** within **Snowflake**: leveraging **Storage Integrations**, **External Stages**, **Streams**, and **Tasks** for automated orchestration, and **Stored Procedures** for robust SQL transformations. The system automates the processing of retail sales data—transforming it through Bronze, Silver, and Gold layers into a polished dimensional model (Star Schema) ready for advanced business intelligence and analytical reporting.
 
 ---
 
@@ -145,6 +143,16 @@ A detailed look at the curated analytical tables:
 | `CUSTOMER_ID`  | INT    | Business ID.            |
 | `COUNTRY`      | STRING | Geographic location.    |
 | `GENDER`       | STRING | Unified across CRM/ERP. |
+
+### **`GOLD.DIM_PRODUCTS`**
+
+| Column         | Type   | Context                            |
+| :------------- | :----- | :--------------------------------- |
+| `PRODUCT_KEY`  | INT    | Unique surrogate key.              |
+| `PRODUCT_ID`   | INT    | Business ID for the product.       |
+| `PRODUCT_NAME` | STRING | Descriptive name of the product.   |
+| `CATEGORY`     | STRING | High-level product classification. |
+| `COST`         | INT    | Standard product cost.             |
 
 ### **`GOLD.FACT_SALES`**
 

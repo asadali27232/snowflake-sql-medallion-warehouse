@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.0 Chrome/140.0.7339.249 Electron/38.7.2 Safari/537.36" version="29.3.0">
   <diagram name="Page-1" id="m92Jmjf5ksdotX18qUWe">
-    <mxGraphModel dx="1273" dy="976" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1018" dy="781" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -414,9 +414,6 @@
             <mxPoint x="610" y="100" as="sourcePoint" />
             <mxPoint x="700" y="172" as="targetPoint" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="ZtDAZ5xBP-GwvUocWml1-112" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;fillWeight=4;hachureGap=8;hachureAngle=45;fillColor=none;sketch=1;fontSize=17;fontStyle=1" value="DATE MODEL (STAR SCHEMA)" vertex="1">
-          <mxGeometry height="60" width="320" x="370" y="80" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
